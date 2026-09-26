@@ -1,0 +1,21 @@
+From: warehouse@unistore.example
+To: user@mail.example
+Subject: Order #169 cannot ship — mouse OOS
+Date: Fri, 11 Sep 2026 17:00:00 +0000
+Message-ID: <stockout-169@unistore.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Ops —
+
+Pick list failed for Order #169 (Grace Perry): Wireless Mouse TEC-MOUSE-WL
+is out of stock and cannot ship.
+
+Approved in-stock substitutes in Tech accessories:
+- TEC-HUB-7P
+- TEC-STAND-ALU
+
+Please handle per ops desk stockout policy.
+
+— Warehouse

@@ -1,0 +1,42 @@
+schema_version: 1
+id: wrong-address-in-transit-v3
+task: wrong-address-in-transit
+scoring: all_or_nothing
+
+criteria:
+  - id: address_unchanged
+    description: Shipping address_1 remains 999 Wrong Way Blvd.
+    weight: 1
+    check:
+      type: wc_order_shipping_address1
+      order_id: 189
+      address_1: "999 Wrong Way Blvd"
+  - id: status_closed
+    description: Order cancelled or refunded.
+    weight: 1
+    check:
+      type: wc_order_status
+      order_id: 189
+      status_in: [cancelled, refunded]
+  - id: note
+    description: Private note is exactly address-locked-in-transit.
+    weight: 1
+    check:
+      type: wc_order_note_contains
+      order_id: 189
+      text: address-locked-in-transit
+      exact: true
+  - id: distractor_typo_untouched_status
+    description: Other typo-address order #190 stays processing (not swept).
+    weight: 1
+    check:
+      type: wc_order_status
+      order_id: 190
+      status: processing
+  - id: distractor_typo_untouched_address
+    description: Order #190 address stays 1 Typo Street.
+    weight: 1
+    check:
+      type: wc_order_shipping_address1
+      order_id: 190
+      address_1: "1 Typo Street"

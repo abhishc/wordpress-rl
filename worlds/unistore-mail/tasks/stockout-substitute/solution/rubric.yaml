@@ -1,0 +1,32 @@
+schema_version: 1
+id: stockout-substitute-v2
+task: stockout-substitute
+scoring: all_or_nothing
+
+criteria:
+  - id: on_hold
+    description: Order #169 is on-hold.
+    weight: 1
+    check: {type: wc_order_status, order_id: 169, status: on-hold}
+
+  - id: lines_unchanged
+    description: Order #169 still has TEC-MOUSE-WL (not emptied/swapped).
+    weight: 1
+    check:
+      type: wc_order_line_skus
+      order_id: 169
+      skus: [TEC-MOUSE-WL]
+
+  - id: no_refund
+    description: Order #169 has no refunds.
+    weight: 1
+    check: {type: wc_order_no_refunds, order_id: 169}
+
+  - id: note_exact
+    description: Private note is exactly the stockout substitute line.
+    weight: 1
+    check:
+      type: wc_order_note_contains
+      order_id: 169
+      text: "stockout-hold substitutes TEC-HUB-7P TEC-STAND-ALU"
+      exact: true

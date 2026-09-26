@@ -1,0 +1,19 @@
+# Public / eval-facing metadata. Baker secrets live in app.secrets.yaml.
+id: mail
+title: Mail
+tagline: Local webmail
+description: Roundcube inbox for the world. Domain mail.example. One agent mailbox. Baker injects via the ops API, not an ops inbox.
+uses:
+  - Roundcube
+  - Postfix
+  - Dovecot
+  - MySQL
+needs:
+  - mysql
+database: roundcubemail
+domain: mail.example
+api: http://127.0.0.1:19182/
+login:
+  url: http://127.0.0.1:19181/
+  username: user
+  password: local-mail-password

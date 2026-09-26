@@ -1,0 +1,7 @@
+# Generated per bake — not shipped (see SECRETS.md)
+**/runtime.env
+**/.env
+**/app.secrets.yaml
+**/users.runtime
+**/users.runtime.*
+**/credentials

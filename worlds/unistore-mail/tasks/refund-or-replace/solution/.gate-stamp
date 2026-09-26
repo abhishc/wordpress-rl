@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "world": "unistore-mail",
+  "task": "refund-or-replace",
+  "contract_sha256": "ef38134959215181f1021947fea3a8348e2530031f0e2dc460083d0654909a59",
+  "gated_utc": "2026-09-15T12:47:15Z"
+}

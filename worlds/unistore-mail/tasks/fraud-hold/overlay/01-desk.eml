@@ -1,0 +1,23 @@
+From: risk@unistore.example
+To: user@mail.example
+Subject: Fraud desk: Lake Shore velocity alert
+Date: Fri, 11 Sep 2026 16:00:00 +0000
+Message-ID: <fraud-hold-lakeshore@unistore.example>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Ops —
+
+Velocity alert: three near-in-time processing orders share shipping
+4421 Lake Shore Dr and the same high-value tech cart (65W charger x2 +
+power bank x2 = $146.00):
+
+- #159 Liam Kim
+- #160 Owen Singh
+- #161 Julian Lopez
+
+Review against ops desk fraud-velocity policy and act only on the matching
+burst. Other Lake Shore / same-day orders may exist; discriminate by pattern.
+
+— Risk

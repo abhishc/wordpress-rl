@@ -1,0 +1,27 @@
+# World manifest — apply/gate/export/bench read this (do not hardcode app lists).
+id: unistore-mail
+title: UniStore + Mail
+schema_version: 1
+
+apps:
+  - id: unistore
+    role: shop
+  - id: mail
+    role: mail
+    overlay: eml   # task overlay/*.eml applied via scripts/mail/mail-inject
+
+ports:
+  unistore: 19180
+  mail_ui: 19181
+  mail_inject: 19182
+
+compose_projects:
+  unistore: world-unistore
+  mail: world-unistore-mail
+
+tasks:
+  - refund-or-replace
+  - fraud-hold
+  - stockout-substitute
+  - partial-fulfill-split
+  - wrong-address-in-transit

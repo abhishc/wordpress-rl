@@ -1,0 +1,13 @@
+name: world-unistore-mail-20260915
+created_utc: 2026-09-15T12:16:41Z
+world: unistore-mail
+apps: unistore, mail
+tasks: refund-or-replace, fraud-hold, stockout-substitute, partial-fulfill-split, wrong-address-in-transit
+include_secrets: 0
+ports: unistore=19180, mail_ui=19181, mail_inject=19182
+gate_verified: 1
+gate.refund-or-replace: contract_sha256=ef38134959215181f1021947fea3a8348e2530031f0e2dc460083d0654909a59 gated_utc=2026-09-15T12:06:11Z
+gate.fraud-hold: contract_sha256=5befbf16cc2c0e6dbafc8f58bfd4bfe4d9b3dd24215432ea57cf8253e4d8627d gated_utc=2026-09-15T12:06:59Z
+gate.stockout-substitute: contract_sha256=205e3f1383c86394462e78bed3c295ca2b55df905eb2b9699de280c91b089a3b gated_utc=2026-09-15T12:07:46Z
+gate.partial-fulfill-split: contract_sha256=31b0b77b31714fd5a4070b6ec7ef324f80a122d5b70fd8478275d5ca2f2b5d4d gated_utc=2026-09-15T12:08:33Z
+gate.wrong-address-in-transit: contract_sha256=16b03b0ca573a919a2fd52763dcbcb67fba32baf08cd202e06464cf6477d1b97 gated_utc=2026-09-15T12:09:19Z

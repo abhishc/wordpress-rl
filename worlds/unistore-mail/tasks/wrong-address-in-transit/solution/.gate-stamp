@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "world": "unistore-mail",
+  "task": "wrong-address-in-transit",
+  "contract_sha256": "16b03b0ca573a919a2fd52763dcbcb67fba32baf08cd202e06464cf6477d1b97",
+  "gated_utc": "2026-09-15T12:50:24Z"
+}

@@ -1,0 +1,84 @@
+name: world-unistore
+
+services:
+  db:
+    image: mysql:8.4@sha256:b3b90af2a6552ae30c266fdb7d5dd55f3afb72404bb78d37fe8a23eb857fd3fb
+    mem_limit: 1g
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set apps/unistore/.env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set apps/unistore/.env}
+      TZ: UTC
+    command:
+      - --default-time-zone=+00:00
+      - --skip-log-bin
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}", "--silent"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+    networks:
+      - world
+
+  wordpress:
+    image: wordpress:php8.4-apache@sha256:8c895fbeb5a2cfc5bdabb1dde9cf3cb7209ed60ab48650630ed57333777b7d55
+    mem_limit: 512m
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_TABLE_PREFIX: wp_
+      WORDPRESS_AUTH_KEY: ${WORDPRESS_AUTH_KEY:?set apps/unistore/.env}
+      WORDPRESS_SECURE_AUTH_KEY: ${WORDPRESS_SECURE_AUTH_KEY}
+      WORDPRESS_LOGGED_IN_KEY: ${WORDPRESS_LOGGED_IN_KEY}
+      WORDPRESS_NONCE_KEY: ${WORDPRESS_NONCE_KEY}
+      WORDPRESS_AUTH_SALT: ${WORDPRESS_AUTH_SALT}
+      WORDPRESS_SECURE_AUTH_SALT: ${WORDPRESS_SECURE_AUTH_SALT}
+      WORDPRESS_LOGGED_IN_SALT: ${WORDPRESS_LOGGED_IN_SALT}
+      WORDPRESS_NONCE_SALT: ${WORDPRESS_NONCE_SALT}
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'DISABLE_WP_CRON', true );
+        define( 'AUTOMATIC_UPDATER_DISABLED', true );
+        define( 'WP_AUTO_UPDATE_CORE', false );
+        define( 'WP_ENVIRONMENT_TYPE', 'local' );
+    volumes:
+      - wp_data:/var/www/html
+    ports:
+      - "127.0.0.1:19180:80"
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1',80,$$e,$$s,2)?0:1);"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+      start_period: 40s
+    networks:
+      - world
+      - edge
+
+networks:
+  world:
+    name: world-unistore-world
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.213.10.0/24
+  edge:
+    name: world-unistore-edge
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+    ipam:
+      config:
+        - subnet: 10.213.11.0/24
+
+volumes:
+  db_data:
+  wp_data:

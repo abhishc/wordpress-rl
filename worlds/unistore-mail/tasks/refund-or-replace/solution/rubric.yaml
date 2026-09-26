@@ -1,0 +1,53 @@
+schema_version: 1
+id: refund-or-replace-v2
+task: refund-or-replace
+scoring: all_or_nothing
+
+criteria:
+  - id: original_still_completed
+    description: Order #149 remains completed (not cancelled).
+    weight: 1
+    check:
+      type: wc_order_status
+      order_id: 149
+      status: completed
+
+  - id: original_no_refund
+    description: Order #149 has no refunds.
+    weight: 1
+    check:
+      type: wc_order_no_refunds
+      order_id: 149
+
+  - id: original_lines_unchanged
+    description: Order #149 still has the original hoodie line (not emptied/swapped).
+    weight: 1
+    check:
+      type: wc_order_line_skus
+      order_id: 149
+      skus: [UNI-HOOD-BLK]
+
+  - id: replacement_note
+    description: Private note on #149 is exactly replacement-issued.
+    weight: 1
+    check:
+      type: wc_order_note_contains
+      order_id: 149
+      text: replacement-issued
+      exact: true
+
+  - id: replacement_order
+    description: >-
+      New COD order for same customer, sole line UNI-HOOD-BLK qty 1,
+      customer note exactly Replacement for order #149.
+    weight: 1
+    check:
+      type: wc_replacement_order
+      exclude_order_id: 149
+      match_customer_id_from_order: 149
+      customer_email: ethan.chen5@example.com
+      sku: UNI-HOOD-BLK
+      quantity: 1
+      payment_method: cod
+      sole_line_item: true
+      customer_note: "Replacement for order #149"

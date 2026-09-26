@@ -1,0 +1,17 @@
+# Public / eval-facing metadata. Baker secrets live in app.secrets.yaml.
+# Hashed admin also lives in snapshots/wordpress.sql.
+id: unistore
+title: UniStore
+tagline: Campus and city shop
+description: WooCommerce store. Shop pages and APIs exist. Catalog is empty until scenery is planted.
+uses:
+  - WordPress
+  - WooCommerce
+  - MySQL
+needs:
+  - mysql
+database: wordpress
+api: http://127.0.0.1:19180/handbook/
+wc_api: http://127.0.0.1:19180/wp-json/wc/v3/
+login:
+  url: http://127.0.0.1:19180/wp-admin/

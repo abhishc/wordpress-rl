@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "world": "unistore-mail",
+  "task": "stockout-substitute",
+  "contract_sha256": "205e3f1383c86394462e78bed3c295ca2b55df905eb2b9699de280c91b089a3b",
+  "gated_utc": "2026-09-15T12:48:51Z"
+}

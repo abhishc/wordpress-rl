@@ -1,0 +1,41 @@
+schema_version: 1
+id: partial-fulfill-split-v3
+task: partial-fulfill-split
+scoring: all_or_nothing
+
+criteria:
+  - id: tote_only
+    description: Order #179 line items are only BAG-TOTE-CNV.
+    weight: 1
+    check:
+      type: wc_order_line_skus
+      order_id: 179
+      skus: [BAG-TOTE-CNV]
+  - id: note
+    description: Private note is exactly partial-fulfill.
+    weight: 1
+    check:
+      type: wc_order_note_contains
+      order_id: 179
+      text: partial-fulfill
+      exact: true
+  - id: status_ok
+    description: Order is processing or completed.
+    weight: 1
+    check:
+      type: wc_order_status
+      order_id: 179
+      status_in: [processing, completed]
+  - id: no_refund
+    description: Order #179 has no refunds.
+    weight: 1
+    check:
+      type: wc_order_no_refunds
+      order_id: 179
+  - id: distractor_bags_untouched
+    description: Other bag order #177 still has sling+duffel (not swept).
+    weight: 1
+    check:
+      type: wc_order_line_skus
+      order_id: 177
+      skus: [BAG-DUFF-45, BAG-SLING-GRY]

@@ -1,0 +1,31 @@
+# Task manifest
+id: partial-fulfill-split
+schema_version: 1
+world: unistore-mail
+title: Partial ship tote — drop OOS sling
+instruction: instruction.md
+rubric: solution/rubric.yaml
+oracle: solution/oracle/run.py
+apps_required:
+  - mail
+  - unistore
+overlay:
+  - overlay/*.eml
+eval:
+  mail:
+    url: http://127.0.0.1:19181/
+    username: user
+    password: local-mail-password
+  unistore:
+    public: http://127.0.0.1:19180/
+    wp_admin: http://127.0.0.1:19180/wp-admin/
+    username: ops
+    password: ops-desk
+    application_password: 'qosV m6pc luk5 d0oG bxvG kRdA'
+  order:
+    id: 179
+    keep_sku: BAG-TOTE-CNV
+    drop_sku: BAG-SLING-GRY
+    note_token: partial-fulfill
+    leave_alone_order_id: 177
+    leave_alone_skus: [BAG-DUFF-45, BAG-SLING-GRY]

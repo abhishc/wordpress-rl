@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "world": "unistore-mail",
+  "task": "partial-fulfill-split",
+  "contract_sha256": "31b0b77b31714fd5a4070b6ec7ef324f80a122d5b70fd8478275d5ca2f2b5d4d",
+  "gated_utc": "2026-09-15T12:49:37Z"
+}

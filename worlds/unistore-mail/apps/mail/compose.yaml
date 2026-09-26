@@ -1,0 +1,176 @@
+name: world-unistore-mail
+
+services:
+  db:
+    image: mysql:8.4@sha256:b3b90af2a6552ae30c266fdb7d5dd55f3afb72404bb78d37fe8a23eb857fd3fb
+    mem_limit: 1g
+    environment:
+      MYSQL_DATABASE: roundcubemail
+      MYSQL_USER: roundcube
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set apps/mail/.env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set apps/mail/.env}
+      TZ: UTC
+    command:
+      - --default-time-zone=+00:00
+      - --skip-log-bin
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD}", "--silent"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+    networks:
+      - world
+
+  vmail-init:
+    image: mysql:8.4@sha256:b3b90af2a6552ae30c266fdb7d5dd55f3afb72404bb78d37fe8a23eb857fd3fb
+    user: "0:0"
+    entrypoint: ["/bin/chown"]
+    command: ["1000:1000", "/srv/vmail"]
+    volumes:
+      - vmail:/srv/vmail
+    networks:
+      - world
+
+  dovecot:
+    image: dovecot/dovecot:2.4.4@sha256:723e3392fe16c6fad8ddc605ea767cc01b4bad9cd9f13eb1dbac15e79c89b2d4
+    mem_limit: 256m
+    depends_on:
+      vmail-init:
+        condition: service_completed_successfully
+    environment:
+      USER_PASSWORD: "local-mail-password"
+    volumes:
+      - vmail:/srv/vmail
+      - ./users.runtime:/srv/vmail/.users:ro
+      - ./dovecot/conf.d/auth.conf:/etc/dovecot/conf.d/auth.conf:ro
+      - ./dovecot/conf.d/10-lmtp-plain.conf:/etc/dovecot/conf.d/10-lmtp-plain.conf:ro
+      - ./dovecot/conf.d/20-no-chroot.conf:/etc/dovecot/conf.d/20-no-chroot.conf:ro
+      - ./dovecot/conf.d/30-userdb.conf:/etc/dovecot/conf.d/30-userdb.conf:ro
+      - ./dovecot/conf.d/40-mailbox-fs.conf:/etc/dovecot/conf.d/40-mailbox-fs.conf:ro
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "31143"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+    networks:
+      - world
+
+  postfix:
+    image: boky/postfix:v5.1.0-debian@sha256:aafc772384232497bed875e1eb66b4d3e54ba1ebc86e2e185a6dc1dbc48182ef
+    mem_limit: 128m
+    depends_on:
+      dovecot:
+        condition: service_healthy
+    environment:
+      ALLOW_EMPTY_SENDER_DOMAINS: "true"
+      POSTFIX_myhostname: mail.example
+    volumes:
+      - ./postfix/docker-init.d:/docker-init.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z -w 2 127.0.0.1 587"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    networks:
+      - world
+
+  inject:
+    image: python:3.12-alpine
+    mem_limit: 64m
+    depends_on:
+      postfix:
+        condition: service_healthy
+    environment:
+      POSTFIX_HOST: postfix
+      APP_YAML: /app/app.yaml
+      APP_SECRETS: /app/app.secrets.yaml
+      USERS_FILE: /data/users.runtime
+    volumes:
+      - ./scripts/injectd.py:/app/injectd.py:ro
+      - ./app.yaml:/app/app.yaml:ro
+      - ./app.secrets.yaml:/app/app.secrets.yaml:ro
+      - ./users.runtime:/data/users.runtime
+    command: ["python", "/app/injectd.py"]
+    ports:
+      - "127.0.0.1:19182:8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    networks:
+      - world
+      - ops
+
+  roundcube:
+    image: roundcube/roundcubemail:1.6.18-apache@sha256:1019137efbcc921d9718a4eee7ed79cb48604150583f59f429e61ce4e8894c68
+    mem_limit: 256m
+    depends_on:
+      db:
+        condition: service_healthy
+      dovecot:
+        condition: service_healthy
+      postfix:
+        condition: service_healthy
+    environment:
+      # Edge network has no NAT; entrypoint must not reach plugins.roundcube.net.
+      COMPOSER_DISABLE_NETWORK: "1"
+      ROUNDCUBEMAIL_DEFAULT_HOST: tls://dovecot
+      ROUNDCUBEMAIL_DEFAULT_PORT: "31143"
+      ROUNDCUBEMAIL_SMTP_SERVER: postfix
+      ROUNDCUBEMAIL_SMTP_PORT: "587"
+      ROUNDCUBEMAIL_USERNAME_DOMAIN: mail.example
+      ROUNDCUBEMAIL_DB_TYPE: mysql
+      ROUNDCUBEMAIL_DB_HOST: db
+      ROUNDCUBEMAIL_DB_PORT: "3306"
+      ROUNDCUBEMAIL_DB_USER: roundcube
+      ROUNDCUBEMAIL_DB_PASSWORD: ${MYSQL_PASSWORD}
+      ROUNDCUBEMAIL_DB_NAME: roundcubemail
+      ROUNDCUBEMAIL_DES_KEY: ${ROUNDCUBEMAIL_DES_KEY:?set apps/mail/.env}
+    volumes:
+      - ./roundcube/config.inc.php:/var/roundcube/config/zzz_local.php:ro
+    ports:
+      - "127.0.0.1:19181:80"
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1',80,$$e,$$s,2)?0:1);"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+    networks:
+      - world
+      - edge
+
+networks:
+  world:
+    name: world-unistore-mail-world
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.213.20.0/24
+  edge:
+    name: world-unistore-mail-edge
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+    ipam:
+      config:
+        - subnet: 10.213.21.0/24
+  ops:
+    name: world-unistore-mail-ops
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+    ipam:
+      config:
+        - subnet: 10.213.22.0/24
+
+volumes:
+  db_data:
+  vmail:

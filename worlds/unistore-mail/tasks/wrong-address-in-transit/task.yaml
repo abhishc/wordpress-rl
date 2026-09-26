@@ -1,0 +1,30 @@
+# Task manifest
+id: wrong-address-in-transit
+schema_version: 1
+world: unistore-mail
+title: Wrong address after carrier scan — do not rewrite
+instruction: instruction.md
+rubric: solution/rubric.yaml
+oracle: solution/oracle/run.py
+apps_required:
+  - mail
+  - unistore
+overlay:
+  - overlay/*.eml
+eval:
+  mail:
+    url: http://127.0.0.1:19181/
+    username: user
+    password: local-mail-password
+  unistore:
+    public: http://127.0.0.1:19180/
+    wp_admin: http://127.0.0.1:19180/wp-admin/
+    username: ops
+    password: ops-desk
+    application_password: 'qosV m6pc luk5 d0oG bxvG kRdA'
+  order:
+    id: 189
+    locked_address_1: "999 Wrong Way Blvd"
+    note_token: address-locked-in-transit
+    leave_alone_order_id: 190
+    leave_alone_address_1: "1 Typo Street"

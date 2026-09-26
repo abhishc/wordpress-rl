@@ -1,0 +1,28 @@
+# Task manifest
+id: fraud-hold
+schema_version: 1
+world: unistore-mail
+title: Fraud pattern — hold Lake Shore tech burst
+instruction: instruction.md
+rubric: solution/rubric.yaml
+oracle: solution/oracle/run.py
+apps_required:
+  - mail
+  - unistore
+overlay:
+  - overlay/*.eml
+eval:
+  mail:
+    url: http://127.0.0.1:19181/
+    username: user
+    password: local-mail-password
+  unistore:
+    public: http://127.0.0.1:19180/
+    wp_admin: http://127.0.0.1:19180/wp-admin/
+    username: ops
+    password: ops-desk
+    application_password: 'qosV m6pc luk5 d0oG bxvG kRdA'
+  hold_order_ids: [159, 160, 161]
+  control_order_id: 162
+  leave_alone_order_ids: [182, 184, 186, 224]
+  note_token: fraud-review

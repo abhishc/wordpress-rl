@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "world": "unistore-mail",
+  "task": "fraud-hold",
+  "contract_sha256": "5befbf16cc2c0e6dbafc8f58bfd4bfe4d9b3dd24215432ea57cf8253e4d8627d",
+  "gated_utc": "2026-09-15T12:48:05Z"
+}

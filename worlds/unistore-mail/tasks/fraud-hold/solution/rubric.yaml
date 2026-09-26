@@ -1,0 +1,50 @@
+schema_version: 1
+id: fraud-hold-v2
+task: fraud-hold
+scoring: all_or_nothing
+
+criteria:
+  - id: hold_159
+    description: Order #159 is on-hold.
+    weight: 1
+    check: {type: wc_order_status, order_id: 159, status: on-hold}
+  - id: note_159
+    description: Order #159 private note is exactly fraud-review.
+    weight: 1
+    check: {type: wc_order_note_contains, order_id: 159, text: fraud-review, exact: true}
+  - id: hold_160
+    description: Order #160 is on-hold.
+    weight: 1
+    check: {type: wc_order_status, order_id: 160, status: on-hold}
+  - id: note_160
+    description: Order #160 private note is exactly fraud-review.
+    weight: 1
+    check: {type: wc_order_note_contains, order_id: 160, text: fraud-review, exact: true}
+  - id: hold_161
+    description: Order #161 is on-hold.
+    weight: 1
+    check: {type: wc_order_status, order_id: 161, status: on-hold}
+  - id: note_161
+    description: Order #161 private note is exactly fraud-review.
+    weight: 1
+    check: {type: wc_order_note_contains, order_id: 161, text: fraud-review, exact: true}
+  - id: control_162
+    description: Legitimate control order #162 stays processing.
+    weight: 1
+    check: {type: wc_order_status, order_id: 162, status: processing}
+  - id: no_overhold_182
+    description: Other Lake Shore order #182 stays processing (not swept).
+    weight: 1
+    check: {type: wc_order_status, order_id: 182, status: processing}
+  - id: no_overhold_184
+    description: Other Lake Shore order #184 stays processing (not swept).
+    weight: 1
+    check: {type: wc_order_status, order_id: 184, status: processing}
+  - id: no_overhold_186
+    description: Other Lake Shore order #186 stays processing (not swept).
+    weight: 1
+    check: {type: wc_order_status, order_id: 186, status: processing}
+  - id: no_overhold_224
+    description: Other Lake Shore order #224 stays pending (not swept).
+    weight: 1
+    check: {type: wc_order_status, order_id: 224, status: pending}
